@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>瘋狂打地鼠</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;color:#3b2a1a;font:16px/1.6 -apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:linear-gradient(#bfeaff,#d9f7c4 60%,#a8d98a)}
+main{max-width:560px;margin:0 auto;padding:16px 12px 40px}
+h1{text-align:center;margin:4px 0 10px;font-size:28px}
+.bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.st{background:#fff;border-radius:14px;padding:6px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.st small{display:block;color:#8a7358;font-size:12px}.st b{font-size:22px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:12px}
+.lv button{border:2px solid #7a5230;background:#fff;color:#7a5230;border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.lv button.on{background:#7a5230;color:#fff}
+.go{border:0;border-radius:999px;padding:9px 30px;font-size:18px;font-weight:700;color:#fff;background:#e8542f;box-shadow:0 4px 0 #a73a1c;cursor:pointer}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 #a73a1c}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#5aa33a;border-radius:20px;padding:12px;box-shadow:inset 0 0 0 4px #3f7d27;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.hole{position:relative;height:118px;overflow:hidden;cursor:pointer}
+.mole{position:absolute;left:0;right:0;bottom:20px;text-align:center;font-size:66px;line-height:1;transform:translateY(125%);transition:transform .1s}
+.mole.up{transform:translateY(0)}.mole.hit{transform:translateY(30%) scale(.8,.6);filter:brightness(.8)}
+.dirt{position:absolute;left:0;right:0;bottom:0;height:42px;background:#6b4423;border-radius:50%/60%;box-shadow:inset 0 8px 0 #4e3018;z-index:2}
+.pop{position:absolute;left:50%;top:20%;transform:translateX(-50%);font-weight:900;font-size:26px;z-index:3;pointer-events:none;animation:pop .7s forwards}
+@keyframes pop{to{top:-8%;opacity:0}}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.over{position:fixed;inset:0;background:rgba(40,25,10,.6);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+.over.show{display:flex}
+.card{background:#fff;border-radius:22px;padding:22px;max-width:340px;width:100%;text-align:center}
+.card h2{margin:0 0 4px}.big{font-size:54px;font-weight:900;color:#e8542f;line-height:1.2}
+.guide{margin-top:16px;background:#fff;border-radius:18px;padding:14px 18px;box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.guide h2{margin:0 0 6px;font-size:17px}.guide ol,.guide ul{margin:4px 0;padding-left:22px}
+footer{text-align:center;color:#4c6b3a;font-size:13px;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>🔨 瘋狂打地鼠</h1>
+<div class="bar">
+ <div class="st"><small>分數</small><b id="sc">0</b></div>
+ <div class="st"><small>剩餘時間</small><b id="tm">30</b></div>
+ <div class="st"><small>連擊</small><b id="cb">0</b></div>
+ <div class="st"><small>最高分</small><b id="bs">0</b></div>
+</div>
+<div class="ctl">
+ <div class="lv" id="lv"><button data-l="easy">簡單</button> <button data-l="normal" class="on">普通</button> <button data-l="hard">困難</button></div>
+ <button class="go" id="go">開始遊戲</button>
+ <label style="font-size:14px"><input type="checkbox" id="snd" checked> 音效</label>
+</div>
+<div class="board" id="board"></div>
+
+<div class="guide">
+ <h2>📖 玩法說明</h2>
+ <ol>
+  <li>選擇難度（簡單、普通、困難），按「開始遊戲」，限時 <b>30 秒</b>。</li>
+  <li>地鼠會從洞裡冒出來，用滑鼠點擊或用手指點它，就能得分。</li>
+  <li><b>連續打中</b>會累積連擊，每 5 連擊，每次多加 1 分；漏掉地鼠連擊就歸零。</li>
+  <li>時間結束會顯示你的評價，最高分會記在這台裝置的瀏覽器。</li>
+ </ol>
+ <h2>🎯 角色與計分</h2>
+ <ul>
+  <li>🐹 一般地鼠：+1 分</li>
+  <li>🐭 金色地鼠：+3 分，但停留時間很短，要眼明手快</li>
+  <li>💣 炸彈：<b>不要打！</b>打到扣 3 分並讓連擊歸零，不理它它會自己消失</li>
+ </ul>
+ <h2>💡 小技巧</h2>
+ <ul><li>越到後半段地鼠出現越快，先穩定連擊，再去搶金色地鼠。</li></ul>
+</div>
+<footer>純前端網頁，不收集任何資料</footer>
+</main>
+
+<div class="over" id="over"><div class="card">
+ <h2>時間到！</h2><div class="big" id="fs">0</div>
+ <p id="rate"></p><p id="nb" style="color:#e8542f;font-weight:700"></p>
+ <button class="go" id="again">再玩一次</button>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const CFG={easy:{g:[650,1000],s:[1200,850],m:1,b:.12},normal:{g:[480,800],s:[950,620],m:2,b:.15},hard:{g:[330,580],s:[750,430],m:3,b:.2}};
+const NAME={easy:'簡單',normal:'普通',hard:'困難'};
+let lvl='normal',score=0,left=30,combo=0,run=false,active=new Map(),tSpawn,tClock,ac;
+const holes=[],board=$('board');
+for(let i=0;i<9;i++){const h=document.createElement('div');h.className='hole';h.innerHTML='<div class="mole"></div><div class="dirt"></div>';board.appendChild(h);holes.push(h);h.addEventListener('pointerdown',e=>{e.preventDefault();hit(i)})}
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function best(){try{return +localStorage.getItem('mole_'+lvl)||0}catch(e){return 0}}
+function setBest(v){try{localStorage.setItem('mole_'+lvl,v)}catch(e){}}
+function ui(){$('sc').textContent=score;$('tm').textContent=left;$('cb').textContent=combo;$('bs').textContent=best()}
+function beep(f,d,t){if(!$('snd').checked)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.stop(ac.currentTime+d)}catch(e){}}
+function pop(i,txt,color){const s=document.createElement('div');s.className='pop';s.textContent=txt;s.style.color=color;holes[i].appendChild(s);setTimeout(()=>s.remove(),700)}
+function hide(i){const o=active.get(i);if(!o)return;clearTimeout(o.t);active.delete(i);const m=holes[i].firstChild;m.classList.remove('up','hit')}
+function spawn(){
+ const c=CFG[lvl],p=1-left/30,free=[];holes.forEach((_,i)=>{if(!active.has(i))free.push(i)});
+ if(active.size>=c.m||!free.length)return;
+ const i=free[Math.floor(Math.random()*free.length)],r=Math.random();
+ const type=r<c.b?'bomb':r<c.b+.12?'gold':'mole',m=holes[i].firstChild;
+ m.textContent=type=='bomb'?'💣':type=='gold'?'🐭':'🐹';m.className='mole up';
+ let stay=c.s[0]+(c.s[1]-c.s[0])*p;if(type=='gold')stay*=.7;
+ const o={type,hit:false};o.t=setTimeout(()=>{if(!o.hit&&type!='bomb'){combo=0;ui()}hide(i)},stay);active.set(i,o);
+}
+function loop(){if(!run)return;spawn();const c=CFG[lvl];tSpawn=setTimeout(loop,rnd(c.g[0],c.g[1]))}
+function hit(i){
+ const o=active.get(i);if(!run||!o||o.hit)return;o.hit=true;clearTimeout(o.t);
+ const m=holes[i].firstChild;m.classList.add('hit');setTimeout(()=>hide(i),160);
+ if(o.type=='bomb'){score=Math.max(0,score-3);combo=0;pop(i,'-3','#d11');beep(110,.35,'sawtooth');board.classList.remove('shake');void board.offsetWidth;board.classList.add('shake')}
+ else{combo++;const add=(o.type=='gold'?3:1)+Math.floor(combo/5);score+=add;pop(i,'+'+add,o.type=='gold'?'#e6a100':'#fff');beep(o.type=='gold'?880:520,.1)}
+ ui();
+}
+function start(){
+ clearTimeout(tSpawn);clearInterval(tClock);holes.forEach((_,i)=>hide(i));
+ score=0;left=30;combo=0;run=true;$('over').classList.remove('show');$('go').textContent='重新開始';ui();
+ tClock=setInterval(()=>{left--;ui();if(left<=0)end()},1000);tSpawn=setTimeout(loop,500);
+}
+function end(){
+ run=false;clearTimeout(tSpawn);clearInterval(tClock);holes.forEach((_,i)=>hide(i));
+ const nb=score>best();if(nb)setBest(score);
+ const r=score<10?'還在熱身，再來一次！':score<20?'新手地鼠獵人':score<35?'手速不錯的好手':score<50?'地鼠剋星！':'傳說級打地鼠大師 👑';
+ $('fs').textContent=score;$('rate').textContent='【'+NAME[lvl]+'】'+r;$('nb').textContent=nb&&score>0?'🎉 新的最高分！':'';
+ $('over').classList.add('show');ui();
+}
+$('go').onclick=start;$('again').onclick=start;
+$('lv').onclick=e=>{const b=e.target.closest('button');if(!b)return;lvl=b.dataset.l;[...$('lv').children].forEach(x=>x.classList.toggle('on',x===b));if(run)start();else ui()};
+ui();
+</script>
+</body>
+</html>
